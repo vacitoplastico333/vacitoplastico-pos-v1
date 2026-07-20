@@ -1,13 +1,13 @@
 /* ============================================
-   VACITOPLASTICO POS - CONEXIÓN SUPABASE
+   VACITOPLASTICO POS - CONEXIÓN SUPABASE (CORREGIDO)
    ============================================ */
 
 // 1. CONFIGURACIÓN DE SUPABASE (Tus claves)
 const SUPABASE_URL = 'https://tahejfchdcdcqotjwihc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaGVqZmNoZGNkY3FvdGp3aWhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjAzODksImV4cCI6MjEwMDEzNjM4OX0.1hD0ZR-Yg7VBXXBO3I7xall5YUBZyIe4warbJOfp4JE';
 
-// Inicializar cliente de Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Inicializar cliente de Supabase (Usamos 'supabaseClient' para evitar el conflicto de nombre)
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let productos = [];
 let carrito = [];
@@ -24,7 +24,7 @@ const $fechaHora = document.getElementById('fechaHora');
 
 async function cargarProductos() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('productos')
       .select('*')
       .order('nombre', { ascending: true });
@@ -52,7 +52,7 @@ async function guardarProductoEnNube(datos) {
     emoji: emojis[datos.categoria] || '📦'
   };
 
-  const { data, error } = await supabase.from('productos').insert([nuevo]).select();
+  const { data, error } = await supabaseClient.from('productos').insert([nuevo]).select();
   
   if (error) {
     notificar('Error al guardar en la nube', 'error');
@@ -67,7 +67,7 @@ async function guardarProductoEnNube(datos) {
 async function registrarVentaEnNube(venta) {
   try {
     // 1. Guardar la venta
-    const { error: errorVenta } = await supabase.from('ventas').insert([{
+    const { error: errorVenta } = await supabaseClient.from('ventas').insert([{
       items: venta.items,
       total: venta.total,
       metodo: venta.metodo,
@@ -81,17 +81,16 @@ async function registrarVentaEnNube(venta) {
       const prod = productos.find(p => p.id === item.id);
       if (prod) {
         const nuevoStock = prod.stock - item.cantidad;
-        await supabase
+        await supabaseClient
           .from('productos')
           .update({ stock: nuevoStock })
           .eq('id', item.id);
         
-        // Actualizar también en el array local para que la UI refleje el cambio inmediato
         prod.stock = nuevoStock;
       }
     }
     
-    renderizarProductos(); // Refrescar la vista con el nuevo stock
+    renderizarProductos();
     notificar('Venta sincronizada con la nube ✅');
   } catch (err) {
     console.error('Error registrando venta:', err);
@@ -202,7 +201,7 @@ async function finalizarVenta() {
 
   const metodo = document.getElementById('metodoPago').value;
   const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-  const numeroVenta = Math.floor(Math.random() * 10000); // Simulado por ahora
+  const numeroVenta = Math.floor(Math.random() * 10000);
 
   const venta = {
     items: [...carrito],
@@ -211,15 +210,12 @@ async function finalizarVenta() {
     numero: numeroVenta
   };
 
-  // Mostrar modal de carga
   const btnVender = document.getElementById('btnVender');
   btnVender.textContent = '⏳ Guardando...';
   btnVender.disabled = true;
 
-  // Enviar a la nube
   await registrarVentaEnNube(venta);
 
-  // Mostrar éxito
   const metodosNombres = {
     'efectivo_cup': '💵 Efectivo CUP',
     'efectivo_usd': '💲 Efectivo USD',
@@ -269,7 +265,7 @@ function alternarTema() {
 // --- INICIALIZACIÓN ---
 
 document.addEventListener('DOMContentLoaded', () => {
-  cargarProductos(); // Cargar desde la nube al iniciar
+  cargarProductos();
   renderizarCarrito();
   actualizarReloj();
   setInterval(actualizarReloj, 30000);
