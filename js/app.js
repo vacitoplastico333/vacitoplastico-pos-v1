@@ -1,16 +1,21 @@
 /* ============================================
-   VACITOPLASTICO POS - CONEXIÓN SUPABASE (CORREGIDO)
+   VACITOPLASTICO POS - CONEXIÓN SUPABASE + TASA DE CAMBIO
    ============================================ */
 
 // 1. CONFIGURACIÓN DE SUPABASE (Tus claves)
 const SUPABASE_URL = 'https://tahejfchdcdcqotjwihc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaGVqZmNoZGNkY3FvdGp3aWhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjAzODksImV4cCI6MjEwMDEzNjM4OX0.1hD0ZR-Yg7VBXXBO3I7xall5YUBZyIe4warbJOfp4JE';
 
-// Inicializar cliente de Supabase (Usamos 'supabaseClient' para evitar el conflicto de nombre)
+// Inicializar cliente de Supabase
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let productos = [];
 let carrito = [];
+
+// Variables para la tasa de cambio
+let tasaReferencia = 650;
+let tasaMargen = -10;
+let tasaReal = 640;
 
 // Elementos del DOM
 const $grid = document.getElementById('productosGrid');
@@ -128,7 +133,7 @@ function renderizarProductos() {
 function renderizarCarrito() {
   if (carrito.length === 0) {
     $carritoItems.innerHTML = `<div class="carrito-vacio"><span class="vacio-icon">🛒</span><p>Agrega productos</p></div>`;
-    $total.textContent = '$0.00';
+    $total.textContent = '$0.00 CUP';
     return;
   }
 
@@ -147,8 +152,10 @@ function renderizarCarrito() {
     </div>
   `).join('');
 
-  const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-  $total.textContent = `$${total.toFixed(2)}`;
+  const totalCUP = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  const totalUSD = (totalCUP / tasaReal).toFixed(2);
+  
+  $total.innerHTML = `$${totalCUP.toFixed(2)} CUP <br><span style="font-size:0.8em; color:var(--texto-secundario)">≈ $${totalUSD} USD</span>`;
 }
 
 // --- FUNCIONES DE ACCIÓN ---
@@ -310,4 +317,38 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === overlay) overlay.classList.remove('activo');
     });
   });
+
+  // --- LÓGICA DE TASA DE CAMBIO ---
+  const $tasaRef = document.getElementById('tasaReferencia');
+  const $tasaMargen = document.getElementById('tasaMargen');
+  const $tasaRealDisplay = document.getElementById('tasaRealDisplay');
+
+  function actualizarTasa() {
+    tasaReferencia = parseFloat($tasaRef.value) || 0;
+    tasaMargen = parseFloat($tasaMargen.value) || 0;
+    tasaReal = tasaReferencia + tasaMargen;
+    
+    if (tasaReal <= 0) tasaReal = 1; // Evitar división por cero
+    
+    $tasaRealDisplay.textContent = tasaReal;
+    
+    // Guardar en localStorage para que no se pierda al recargar
+    localStorage.setItem('vp_tasa_ref', tasaReferencia);
+    localStorage.setItem('vp_tasa_margen', tasaMargen);
+    
+    // Recalcular el carrito si hay algo
+    if (carrito.length > 0) renderizarCarrito();
+  }
+
+  // Cargar tasas guardadas o usar defecto
+  const tasaRefGuardada = localStorage.getItem('vp_tasa_ref');
+  const tasaMargenGuardada = localStorage.getItem('vp_tasa_margen');
+  
+  if (tasaRefGuardada) $tasaRef.value = tasaRefGuardada;
+  if (tasaMargenGuardada) $tasaMargen.value = tasaMargenGuardada;
+  
+  actualizarTasa(); // Calcular al inicio
+
+  $tasaRef.addEventListener('input', actualizarTasa);
+  $tasaMargen.addEventListener('input', actualizarTasa);
 });

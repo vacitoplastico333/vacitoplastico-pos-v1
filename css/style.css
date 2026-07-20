@@ -791,3 +791,60 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--texto-secundario);
 }
+
+/* --- ESTILOS DEL PANEL DE TASA DE CAMBIO --- */
+.tasa-panel {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: var(--superficie);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+}
+
+.tasa-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.tasa-input-group label {
+  font-size: 0.7rem;
+  color: var(--texto-secundario);
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.tasa-input-group input {
+  width: 70px;
+  padding: 6px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+.tasa-resultado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--azul);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-width: 80px;
+}
+
+.tasa-resultado span {
+  font-size: 0.65rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.tasa-resultado strong {
+  font-size: 1.1rem;
+  font-weight: 800;
+}

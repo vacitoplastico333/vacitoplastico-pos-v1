@@ -27,20 +27,37 @@
     </div>
   </header>
 
-  <div class="toolbar">
+    <div class="toolbar">
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="buscador" placeholder="Buscar producto..." autocomplete="off">
     </div>
+    
+    <!-- NUEVO: PANEL DE TASA DE CAMBIO -->
+    <div class="tasa-panel">
+      <div class="tasa-input-group">
+        <label>Tasa Ref. (El Toque):</label>
+        <input type="number" id="tasaReferencia" value="650" min="1">
+      </div>
+      <div class="tasa-input-group">
+        <label>Margen (CUP):</label>
+        <input type="number" id="tasaMargen" value="-10" step="1">
+      </div>
+      <div class="tasa-resultado">
+        <span>Tasa Real:</span>
+        <strong id="tasaRealDisplay">640</strong>
+      </div>
+    </div>
+
     <div class="toolbar-btns">
       <select id="selectorCategoria" class="select-categoria">
-        <option value="todos">Todas las categorías</option>
+        <option value="todos">Todas</option>
         <option value="bebidas">🥤 Bebidas</option>
         <option value="alimentos">🍞 Alimentos</option>
         <option value="limpieza">🧹 Limpieza</option>
         <option value="varios">📦 Varios</option>
       </select>
-      <button class="btn-nuevo-producto" id="btnNuevoProducto">+ Producto</button>
+      <button class="btn-nuevo-producto" id="btnNuevoProducto">+ Prod</button>
     </div>
   </div>
 
