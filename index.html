@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e40af">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>VacitoPlástico POS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/icon-512.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon">VP</div>
+      <div>
+        <h1>VacitoPlástico</h1>
+        <span class="header-sub">Sistema POS</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="fecha-hora" id="fechaHora"></span>
+      <button class="btn-icon" id="btnTema" title="Cambiar tema">🌙</button>
+      <button class="btn-icon" id="btnPantallaCompleta" title="Pantalla completa">⛶</button>
+    </div>
+  </header>
+
+  <!-- BARRA DE BUSQUEDA Y CONTROLES -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="buscador" placeholder="Buscar producto..." autocomplete="off">
+    </div>
+    <div class="toolbar-btns">
+      <select id="selectorCategoria" class="select-categoria">
+        <option value="todos">Todas las categorías</option>
+        <option value="bebidas">🥤 Bebidas</option>
+        <option value="alimentos">🍞 Alimentos</option>
+        <option value="limpieza">🧹 Limpieza</option>
+        <option value="varios">📦 Varios</option>
+      </select>
+      <button class="btn-nuevo-producto" id="btnNuevoProducto">+ Producto</button>
+    </div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="pos-layout">
+
+    <!-- PANEL IZQUIERDO: PRODUCTOS -->
+    <section class="panel-productos">
+      <div class="productos-grid" id="productosGrid">
+        <!-- Los productos se generan con JavaScript -->
+      </div>
+    </section>
+
+    <!-- PANEL DERECHO: CARRITO -->
+    <aside class="panel-carrito">
+      <div class="carrito-header">
+        <h2>🛒 Venta Actual</h2>
+        <button class="btn-limpiar" id="btnLimpiarCarrito">Limpiar</button>
+      </div>
+
+      <div class="carrito-items" id="carritoItems">
+        <div class="carrito-vacio" id="carritoVacio">
+          <span class="vacio-icon">🛒</span>
+          <p>Agrega productos para comenzar</p>
+        </div>
+      </div>
+
+      <div class="carrito-footer">
+        <div class="carrito-subtotal">
+          <span>Subtotal:</span>
+          <span id="subtotal">$0.00</span>
+        </div>
+        <div class="carrito-descuento">
+          <span>Descuento:</span>
+          <span id="descuento">$0.00</span>
+        </div>
+        <div class="carrito-total">
+          <span>TOTAL:</span>
+          <span id="total">$0.00</span>
+        </div>
+
+        <div class="metodo-pago">
+          <label>Método de pago:</label>
+          <select id="metodoPago" class="select-pago">
+            <option value="efectivo_cup">💵 Efectivo CUP</option>
+            <option value="efectivo_usd">💲 Efectivo USD</option>
+            <option value="transfermovil">📱 Transfermóvil</option>
+            <option value="enzona">📱 EnZona</option>
+            <option value="tarjeta">💳 Tarjeta</option>
+            <option value="fiao">📝 Fiao (Crédito)</option>
+          </select>
+        </div>
+
+        <button class="btn-vender" id="btnVender">
+          💰 Finalizar Venta
+        </button>
+        <button class="btn-guardar-vender" id="btnGuardar">
+          📄 Guardar y Nueva Venta
+        </button>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- MODAL: NUEVO PRODUCTO -->
+  <div class="modal-overlay" id="modalProducto">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo Producto</h3>
+        <button class="btn-cerrar" id="btnCerrarModal">✕</button>
+      </div>
+      <form id="formProducto" class="modal-body">
+        <div class="form-group">
+          <label>Nombre del producto *</label>
+          <input type="text" id="prodNombre" required placeholder="Ej: Refresco Coca Cola">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio (CUP) *</label>
+            <input type="number" id="prodPrecio" required min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Costo (CUP)</label>
+            <input type="number" id="prodCosto" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" id="prodStock" min="0" value="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Categoría</label>
+            <select id="prodCategoria">
+              <option value="bebidas">🥤 Bebidas</option>
+              <option value="alimentos">🍞 Alimentos</option>
+              <option value="limpieza">🧹 Limpieza</option>
+              <option value="varios">📦 Varios</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Código de barras</label>
+          <input type="text" id="prodCodigo" placeholder="Opcional">
+        </div>
+        <button type="submit" class="btn-guardar">Guardar Producto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VENTA EXITOSA -->
+  <div class="modal-overlay" id="modalVenta">
+    <div class="modal modal-exito">
+      <div class="exito-icon">✅</div>
+      <h3>¡Venta Registrada!</h3>
+      <div class="exito-total" id="exitoTotal">$0.00 CUP</div>
+      <div class="exito-metodo" id="exitoMetodo"></div>
+      <div class="exito-items" id="exitoItems"></div>
+      <button class="btn-vender" id="btnCerrarVenta">Nueva Venta</button>
+    </div>
+  </div>
+
+  <!-- NOTIFICACIONES -->
+  <div class="notificaciones" id="notificaciones"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
